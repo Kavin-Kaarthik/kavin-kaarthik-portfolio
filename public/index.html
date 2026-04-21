@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kavin Kaarthik — Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            syne: ['Syne', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
+            sans: ['DM Sans', 'sans-serif'],
+          },
+          colors: {
+            bg: '#080c10',
+            bg2: '#0d1117',
+            card: '#0f1923',
+            border: '#1a2535',
+            accent: '#00e5ff',
+            purple: '#7b61ff',
+            orange: '#ff6b35',
+            muted: '#4a5c6e',
+            subtle: '#1e2f40',
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #080c10;
+    }
+
+    body {
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* ── Custom cursor ───────────────────────────── */
+    #cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: #00e5ff;
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .2s, height .2s, background .2s;
+      mix-blend-mode: screen;
+    }
+
+    #cursor-ring {
+      width: 40px;
+      height: 40px;
+      border: 1.5px solid rgba(0, 229, 255, 0.5);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width .3s, height .3s, border-color .3s;
+    }
+
+    body:has(a:hover) #cursor-dot,
+    body:has(button:hover) #cursor-dot {
+      width: 14px;
+      height: 14px;
+      background: #7b61ff;
+    }
+
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring {
+      width: 56px;
+      height: 56px;
+      border-color: rgba(123, 97, 255, 0.6);
+    }
+
+    /* ── Grid background ─────────────────────────── */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ── Noise grain overlay ─────────────────────── */
+    .grain::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* ── Glowing orb ─────────────────────────────── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    /* ── Tilt card ───────────────────────────────── */
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease;
+      will-change: transform;
+    }
+
+    .tilt-card .card-shine {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(0, 229, 255, 0.07) 0%, transparent 60%);
+      pointer-events: none;
+      transition: opacity 0.3s;
+      opacity: 0;
+    }
+
+    .tilt-card:hover .card-shine {
+      opacity: 1;
+    }
+
+    /* ── Gradient text ───────────────────────────── */
+    .grad-text {
+      background: linear-gradient(135deg, #00e5ff 0%, #7b61ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .grad-text-warm {
+      background: linear-gradient(135deg, #ff6b35 0%, #7b61ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Section reveal ──────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    /* ── Skill bar ───────────────────────────────── */
+    .skill-bar-fill {
+      height: 2px;
+      background: linear-gradient(90deg, #00e5ff, #7b61ff);
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
+
+    /* ── Nav active ──────────────────────────────── */
+    nav a.active {
+      color: #00e5ff;
+    }
+
+    /* ── Scrollbar ───────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #080c10;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1a2535;
+      border-radius: 2px;
+    }
+
+    /* ── Floating badge ──────────────────────────── */
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* ── Glitch effect ───────────────────────────── */
+    @keyframes glitch {
+      0% {
+        clip-path: inset(40% 0 61% 0);
+        transform: translate(-2px, 0);
+      }
+
+      20% {
+        clip-path: inset(92% 0 1% 0);
+        transform: translate(2px, 0);
+      }
+
+      40% {
+        clip-path: inset(43% 0 1% 0);
+        transform: translate(0, 0);
+      }
+
+      60% {
+        clip-path: inset(25% 0 58% 0);
+        transform: translate(2px, 0);
+      }
+
+      80% {
+        clip-path: inset(54% 0 7% 0);
+        transform: translate(-2px, 0);
+      }
+
+      100% {
+        clip-path: inset(58% 0 43% 0);
+        transform: translate(0, 0);
+      }
+    }
+
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 2px;
+      color: #7b61ff;
+      animation: glitch 3s infinite;
+      clip-path: inset(0 0 100% 0);
+    }
+
+    /* ── Timeline ────────────────────────────────── */
+    .timeline-line {
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, #00e5ff, transparent);
+    }
+
+    .timeline-dot {
+      width: 10px;
+      height: 10px;
+      background: #00e5ff;
+      border-radius: 50%;
+      position: absolute;
+      left: 11px;
+      top: 6px;
+      box-shadow: 0 0 12px #00e5ff;
+    }
+
+    /* ── Typewriter ──────────────────────────────── */
+    .typewriter {
+      border-right: 2px solid #00e5ff;
+      animation: blink .7s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        border-color: #00e5ff
+      }
+
+      50% {
+        border-color: transparent
+      }
+    }
+
+    /* ── Contact form ────────────────────────────── */
+    .form-input {
+      background: #0f1923;
+      border: 1px solid #1a2535;
+      color: #e8edf2;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      width: 100%;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: #00e5ff;
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+    }
+
+    .form-input::placeholder {
+      color: #4a5c6e;
+    }
+
+    /* ── Particle canvas ─────────────────────────── */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 768px) {
+      body {
+        cursor: auto;
+      }
+
+      #cursor-dot,
+      #cursor-ring {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-bg text-white font-sans grid-bg grain">
+
+  <!-- Custom Cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Particle Canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ══════════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════════ -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="#hero" class="font-syne font-black text-xl tracking-tight">
+        <span class="grad-text">KK</span><span class="text-muted">.</span>
+      </a>
+      <ul class="hidden md:flex items-center gap-8 font-mono text-xs tracking-widest uppercase text-muted">
+        <li><a href="#about" class="hover:text-accent transition-colors nav-link">About</a></li>
+        <li><a href="#projects" class="hover:text-accent transition-colors nav-link">Projects</a></li>
+        <li><a href="#hackathons" class="hover:text-accent transition-colors nav-link">Hackathons</a></li>
+        <li><a href="#skills" class="hover:text-accent transition-colors nav-link">Skills</a></li>
+        <li><a href="#contact" class="hover:text-accent transition-colors nav-link">Contact</a></li>
+      </ul>
+      <div class="hidden md:flex items-center gap-3">
+        <!-- GitHub -->
+        <a href="https://github.com/Kavin-Kaarthik" target="_blank"
+          class="flex items-center justify-center w-10 h-10 border border-border rounded-full hover:border-accent hover:text-accent hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all duration-300">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12" />
+          </svg>
+        </a>
+        <!-- LinkedIn -->
+        <a href="https://www.linkedin.com/in/kavin-kaarthik-492141293" target="_blank"
+          class="flex items-center justify-center w-10 h-10 border border-border rounded-full hover:border-[#0077B5] hover:text-[#0077B5] hover:shadow-[0_0_15px_rgba(0,119,181,0.3)] transition-all duration-300">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+        </a>
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/itz_kk_1307/" target="_blank"
+          class="flex items-center justify-center w-10 h-10 border border-border rounded-full hover:border-[#E1306C] hover:text-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)] transition-all duration-300">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+          </svg>
+        </a>
+      </div>
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="md:hidden text-muted hover:text-accent">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-bg2 border-t border-border px-6 py-4">
+      <ul class="flex flex-col gap-4 font-mono text-xs tracking-widest uppercase text-muted">
+        <li><a href="#about" class="hover:text-accent transition-colors block py-1">About</a></li>
+        <li><a href="#projects" class="hover:text-accent transition-colors block py-1">Projects</a></li>
+        <li><a href="#hackathons" class="hover:text-accent transition-colors block py-1">Hackathons</a></li>
+        <li><a href="#skills" class="hover:text-accent transition-colors block py-1">Skills</a></li>
+        <li><a href="#contact" class="hover:text-accent transition-colors block py-1">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════════ -->
+  <section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
+    <!-- Ambient orbs -->
+    <div class="orb w-96 h-96 bg-accent/10 top-20 -left-32" id="orb1"></div>
+    <div class="orb w-80 h-80 bg-purple/10 bottom-20 right-0" id="orb2"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-12 w-full">
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+
+        <!-- Left: Text -->
+        <div>
+          <div id="hero-tag"
+            class="inline-flex items-center gap-2 border border-accent/30 text-accent font-mono text-xs tracking-widest uppercase px-3 py-1.5 rounded-sm mb-8 opacity-0">
+            <span class="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+            Available for opportunities
+          </div>
+
+          <h1 id="hero-name" class="font-syne font-black leading-none tracking-tighter opacity-0"
+            style="font-size:clamp(3.2rem,7vw,6rem)">
+            <span class="block text-white glitch" data-text="Kavin">Kavin</span>
+            <span class="block grad-text">Kaarthik</span>
+          </h1>
+
+          <div class="mt-4 font-mono text-muted text-sm opacity-0" id="hero-role">
+            <span id="typewriter-text" class="typewriter"></span>
+          </div>
+
+          <p id="hero-desc" class="mt-6 text-muted leading-relaxed max-w-lg opacity-0" style="font-size:0.9rem">
+            B.Tech Information Technology student at <span class="text-white font-medium">Coimbatore Institute of
+              Technology</span>. Builder of AI-powered multi-agent systems, full-stack platforms, and community tools —
+            from a 5-agent startup evaluator to a weekend hackathon platform. HackerRank 4★ C++, 100+ LeetCode problems
+            solved. CGPA: <span class="text-accent font-medium">8.7</span>
+          </p>
+
+          <div id="hero-cta" class="mt-10 flex flex-wrap gap-4 opacity-0">
+            <a href="#projects"
+              class="px-6 py-3 bg-accent text-bg font-syne font-bold text-sm rounded-lg hover:bg-white transition-colors duration-200">
+              View Projects
+            </a>
+            <a href="#contact"
+              class="px-6 py-3 border border-border text-white font-mono text-sm rounded-lg hover:border-accent hover:text-accent transition-all duration-200">
+              Get In Touch
+            </a>
+            <a href="/resume.pdf" download
+              class="px-6 py-3 border border-orange/50 text-orange font-mono text-sm rounded-lg hover:border-orange hover:bg-orange/10 transition-all duration-200">
+              Download Resume ↓
+            </a>
+          </div>
+
+          <!-- Stats row -->
+          <div id="hero-stats" class="mt-12 grid grid-cols-3 gap-4 opacity-0">
+            <div class="border border-border rounded-lg p-4 text-center hover:border-accent/50 transition-colors">
+              <div class="font-syne font-black text-3xl grad-text">8.7</div>
+              <div class="font-mono text-muted text-xs mt-1 uppercase tracking-wider">CGPA</div>
+            </div>
+            <div class="border border-border rounded-lg p-4 text-center hover:border-purple/50 transition-colors">
+              <div class="font-syne font-black text-3xl"
+                style="background:linear-gradient(135deg,#7b61ff,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+                5+</div>
+              <div class="font-mono text-muted text-xs mt-1 uppercase tracking-wider">Projects</div>
+            </div>
+            <div class="border border-border rounded-lg p-4 text-center hover:border-orange/50 transition-colors">
+              <div class="font-syne font-black text-3xl grad-text-warm">3+</div>
+              <div class="font-mono text-muted text-xs mt-1 uppercase tracking-wider">Hackathons</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Avatar + floating elements -->
+        <div class="relative hidden md:flex items-center justify-center" id="hero-visual">
+          <!-- Rotating ring -->
+          <div class="absolute w-80 h-80 border border-accent/10 rounded-full animate-spin"
+            style="animation-duration:20s"></div>
+          <div class="absolute w-64 h-64 border border-purple/10 rounded-full animate-spin"
+            style="animation-duration:14s;animation-direction:reverse"></div>
+
+          <!-- Avatar placeholder / initials -->
+          <div id="avatar-card"
+            class="relative w-56 h-56 rounded-2xl border border-border bg-card flex items-center justify-center overflow-hidden tilt-card"
+            style="box-shadow:0 32px 80px rgba(0,0,0,0.5)">
+            <div class="card-shine"></div>
+            <div class="text-center">
+              <div class="font-syne font-black text-7xl grad-text leading-none">KK</div>
+              <div class="font-mono text-muted text-xs mt-2 tracking-widest uppercase">B.Tech IT</div>
+              <div class="font-mono text-accent text-xs mt-1">2024–2028</div>
+            </div>
+            <!-- Corner decorations -->
+            <div class="absolute top-3 left-3 w-3 h-3 border-t border-l border-accent/50 rounded-tl"></div>
+            <div class="absolute top-3 right-3 w-3 h-3 border-t border-r border-accent/50 rounded-tr"></div>
+            <div class="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-accent/50 rounded-bl"></div>
+            <div class="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-accent/50 rounded-br"></div>
+          </div>
+
+          <!-- Floating badges -->
+          <div
+            class="absolute -top-4 -right-4 floating bg-card border border-border rounded-xl px-3 py-2 font-mono text-xs"
+            style="animation-delay:0s">
+            <span class="text-orange">▲</span> <span class="text-white">AI/ML</span>
+          </div>
+          <div
+            class="absolute -bottom-4 -left-4 floating bg-card border border-border rounded-xl px-3 py-2 font-mono text-xs"
+            style="animation-delay:1s">
+            <span class="text-accent">⚡</span> <span class="text-white">Full-Stack</span>
+          </div>
+          <div
+            class="absolute top-1/2 -right-8 floating bg-card border border-border rounded-xl px-3 py-2 font-mono text-xs"
+            style="animation-delay:2s">
+            <span class="text-purple">✦</span> <span class="text-white">Agentic AI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div
+      class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 font-mono text-muted text-xs tracking-widest">
+      <span>SCROLL</span>
+      <div class="w-px h-12 bg-gradient-to-b from-muted to-transparent"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       ABOUT
+  ═══════════════════════════════════════════════════ -->
+  <section id="about" class="py-32 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="reveal">
+        <div class="font-mono text-accent text-xs tracking-widest uppercase mb-4">// 01. About Me</div>
+        <h2 class="font-syne font-black text-4xl md:text-5xl tracking-tight mb-16">
+          Who I <span class="grad-text">Am</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-16 items-start">
+        <div class="reveal space-y-5 text-muted leading-relaxed" style="font-size:0.9rem">
+          <p>
+            I'm <span class="text-white font-medium">Kavin Kaarthik</span>, a 2nd year B.Tech IT student at
+            <span class="text-accent">Coimbatore Institute of Technology</span>, passionate about turning ideas into
+            real digital products — fast.
+          </p>
+          <p>
+            From building a full-stack hackathon management platform over a weekend to engineering a
+            5-agent AI system that evaluates startups from a single URL — I love shipping things that
+            actually work and matter.
+          </p>
+          <p>
+            Beyond code, I was invited as a <span class="text-white font-medium">Guest Speaker at Air India
+              Radio</span>,
+            representing CIT College on their Sunday 5PM show — stepping out of my comfort zone to talk
+            about the future of cinema watching.
+          </p>
+          <p>
+            Currently exploring <span class="text-purple">Agentic AI</span>, LLM orchestration, and full-stack
+            architectures. I actively practice competitive programming with a 4★ rating in C++ on HackerRank and over
+            100+ LeetCode problems solved.
+          </p>
+
+          <!-- Social links -->
+          <div class="flex flex-wrap gap-3 pt-4">
+            <a href="https://github.com/Kavin-Kaarthik" target="_blank"
+              class="flex items-center gap-2 border border-border px-4 py-2 rounded-lg font-mono text-xs hover:border-accent hover:text-accent transition-all">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12" />
+              </svg>
+              GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/kavin-kaarthik-492141293" target="_blank"
+              class="flex items-center gap-2 border border-border px-4 py-2 rounded-lg font-mono text-xs hover:border-purple hover:text-purple transition-all">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              LinkedIn
+            </a>
+            <a href="mailto:sikavin137@gmail.com"
+              class="flex items-center gap-2 border border-border px-4 py-2 rounded-lg font-mono text-xs hover:border-orange hover:text-orange transition-all">
+              ✉ Email
+            </a>
+          </div>
+        </div>
+
+        <!-- Education timeline -->
+        <div class="reveal">
+          <h3 class="font-syne font-bold text-lg mb-8 text-white">Education</h3>
+          <div class="relative pl-10">
+            <div class="timeline-line"></div>
+
+            <div class="relative mb-8">
+              <div class="timeline-dot"></div>
+              <div
+                class="bg-card border border-border rounded-xl p-5 hover:border-accent/50 transition-colors tilt-card"
+                style="--mx:50%;--my:50%">
+                <div class="card-shine"></div>
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <div class="font-syne font-bold text-white text-sm">B.Tech Information Technology</div>
+                    <div class="text-accent text-xs font-mono mt-1">Coimbatore Institute of Technology</div>
+                  </div>
+                  <span class="font-mono text-xs text-muted border border-border px-2 py-1 rounded">2024–28</span>
+                </div>
+                <div class="font-mono text-xs text-muted mt-3">CGPA: <span class="text-accent">8.7</span> &nbsp;·&nbsp;
+                  Coimbatore, TN</div>
+              </div>
+            </div>
+
+            <div class="relative mb-8">
+              <div class="timeline-dot" style="background:#7b61ff;box-shadow:0 0 12px #7b61ff"></div>
+              <div
+                class="bg-card border border-border rounded-xl p-5 hover:border-purple/50 transition-colors tilt-card"
+                style="--mx:50%;--my:50%">
+                <div class="card-shine"></div>
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <div class="font-syne font-bold text-white text-sm">Higher Secondary (12th)</div>
+                    <div class="text-purple text-xs font-mono mt-1">Chavara Vidhya Bhavan</div>
+                  </div>
+                  <span class="font-mono text-xs text-muted border border-border px-2 py-1 rounded">2024</span>
+                </div>
+                <div class="font-mono text-xs text-muted mt-3">Score: <span class="text-purple">96%</span> &nbsp;·&nbsp;
+                  Coimbatore</div>
+              </div>
+            </div>
+
+            <div class="relative">
+              <div class="timeline-dot" style="background:#ff6b35;box-shadow:0 0 12px #ff6b35"></div>
+              <div
+                class="bg-card border border-border rounded-xl p-5 hover:border-orange/50 transition-colors tilt-card"
+                style="--mx:50%;--my:50%">
+                <div class="card-shine"></div>
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <div class="font-syne font-bold text-white text-sm">Secondary (10th)</div>
+                    <div class="text-orange text-xs font-mono mt-1">Chavara Vidhya Bhavan</div>
+                  </div>
+                  <span class="font-mono text-xs text-muted border border-border px-2 py-1 rounded">2022</span>
+                </div>
+                <div class="font-mono text-xs text-muted mt-3">Score: <span class="text-orange">93%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       PROJECTS
+  ═══════════════════════════════════════════════════ -->
+  <section id="projects" class="py-32 relative">
+    <div class="orb w-72 h-72 bg-purple/8 top-0 right-0"></div>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="reveal">
+        <div class="font-mono text-accent text-xs tracking-widest uppercase mb-4">// 02. Projects</div>
+        <h2 class="font-syne font-black text-4xl md:text-5xl tracking-tight mb-4">
+          What I've <span class="grad-text">Built</span>
+        </h2>
+        <p class="text-muted font-mono text-sm mb-16">From weekend projects to academic showcases</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- HackHub -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-6 relative overflow-hidden hover:border-accent/60 transition-all duration-300 group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"></div>
+          <div
+            class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-lg">⚡</div>
+            <div class="flex gap-2">
+              <span class="font-mono text-xs text-accent border border-accent/30 px-2 py-0.5 rounded">Weekend
+                Build</span>
+            </div>
+          </div>
+          <h3 class="font-syne font-bold text-xl text-white mb-2">HackHub</h3>
+          <p class="text-muted text-sm leading-relaxed mb-5">Full-stack hackathon management platform — registration,
+            team formation, project submission, live judging & real-time leaderboard. Built in 2 days.</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Vanilla JS</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Vite</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Supabase</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Vercel</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <a href="https://lnkd.in/g8T6tcqG" target="_blank"
+              class="flex items-center gap-2 font-mono text-xs text-accent hover:underline">
+              Live Demo ↗
+            </a>
+            <a href="https://github.com/Kavin-Kaarthik/hackhub" target="_blank"
+              class="flex items-center gap-2 font-mono text-xs text-accent hover:underline">
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Trust Engine -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-6 relative overflow-hidden hover:border-purple/60 transition-all duration-300 group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"
+            style="background:radial-gradient(circle at var(--mx) var(--my), rgba(123,97,255,0.07) 0%, transparent 60%)">
+          </div>
+          <div
+            class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 rounded-lg bg-purple/10 flex items-center justify-center text-purple text-lg">🤖</div>
+            <span class="font-mono text-xs text-purple border border-purple/30 px-2 py-0.5 rounded">Agentic AI</span>
+          </div>
+          <h3 class="font-syne font-bold text-xl text-white mb-2">Trust Engine</h3>
+          <p class="text-muted text-sm leading-relaxed mb-5">Multi-agent AI system (5 agents) that evaluates startups
+            from a single URL — OSINT extraction, GitHub scoring, cybersecurity audit, and weighted trust score.</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">FastAPI</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">LangChain</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">LLaMA3</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Pydantic v2</span>
+          </div>
+          <a href="https://lnkd.in/gqHhJ7uk" target="_blank"
+            class="flex items-center gap-2 font-mono text-xs text-purple hover:underline">
+            GitHub ↗
+          </a>
+        </div>
+
+        <!-- Oceonix -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-6 relative overflow-hidden hover:border-accent/60 transition-all duration-300 group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"></div>
+          <div
+            class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-lg">🌊</div>
+            <span class="font-mono text-xs text-accent border border-accent/30 px-2 py-0.5 rounded">Community</span>
+          </div>
+          <h3 class="font-syne font-bold text-xl text-white mb-2">Oceonix</h3>
+          <p class="text-muted text-sm leading-relaxed mb-5">Low-bandwidth community web platform for marine pollution
+            reporting from remote areas. Reports verified and converted into actionable cleanup insights with gamified
+            eco-points.</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Web Dev</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Community</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Gamification</span>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <span class="font-mono text-xs text-muted">Oct 2025</span>
+            <a href="https://github.com/Kavin-Kaarthik/marine" target="_blank"
+              class="flex items-center gap-2 font-mono text-xs text-accent hover:underline">
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Smart Travel Tourism -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-6 relative overflow-hidden hover:border-orange/60 transition-all duration-300 group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"
+            style="background:radial-gradient(circle at var(--mx) var(--my), rgba(255,107,53,0.07) 0%, transparent 60%)">
+          </div>
+          <div
+            class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 rounded-lg bg-orange/10 flex items-center justify-center text-lg">✈️</div>
+            <span class="font-mono text-xs text-orange border border-orange/30 px-2 py-0.5 rounded">SIH 2025</span>
+          </div>
+          <h3 class="font-syne font-bold text-xl text-white mb-2">Smart Travel Tourism</h3>
+          <p class="text-muted text-sm leading-relaxed mb-5">AI-powered platform personalizing travel with hidden gems,
+            VR exploration, interactive cultural quizzes, multilingual support, and real-time crowd density estimation.
+          </p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">AI</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Django</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">VR</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Maps API</span>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <span class="font-mono text-xs text-muted">Sep 2025</span>
+            <a href="https://github.com/Kavin-Kaarthik/sih" target="_blank"
+              class="flex items-center gap-2 font-mono text-xs text-orange hover:underline">
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+
+
+        <!-- ServiceHub (DEVSPARK) -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-6 relative overflow-hidden hover:border-purple/60 transition-all duration-300 group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"
+            style="background:radial-gradient(circle at var(--mx) var(--my), rgba(123,97,255,0.07) 0%, transparent 60%)">
+          </div>
+          <div
+            class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 rounded-lg bg-purple/10 flex items-center justify-center text-lg">🛠️</div>
+            <span class="font-mono text-xs text-purple border border-purple/30 px-2 py-0.5 rounded">DEVSPARK'25</span>
+          </div>
+          <h3 class="font-syne font-bold text-xl text-white mb-2">ServiceHub</h3>
+          <p class="text-muted text-sm leading-relaxed mb-5">Verified professional services marketplace connecting
+            clients with home and technical service providers — built in 24 hours at a national hackathon.</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Full-Stack</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">Marketplace</span>
+            <span class="font-mono text-xs bg-subtle text-muted px-2 py-0.5 rounded">IEEE</span>
+          </div>
+          <div class="flex items-center justify-between w-full">
+            <span class="font-mono text-xs text-muted">2025</span>
+            <a href="https://github.com/Kavin-Kaarthik/k" target="_blank"
+              class="flex items-center gap-2 font-mono text-xs text-purple hover:underline">
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       HACKATHONS & ACHIEVEMENTS
+  ═══════════════════════════════════════════════════ -->
+  <section id="hackathons" class="py-32 relative">
+    <div class="orb w-72 h-72 bg-accent/5 bottom-0 left-0"></div>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="reveal">
+        <div class="font-mono text-accent text-xs tracking-widest uppercase mb-4">// 03. Hackathons & Achievements</div>
+        <h2 class="font-syne font-black text-4xl md:text-5xl tracking-tight mb-16">
+          Competing & <span class="grad-text">Growing</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- SIH 2025 -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-7 relative overflow-hidden hover:border-orange/50 transition-all group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"
+            style="background:radial-gradient(circle at var(--mx) var(--my), rgba(255,107,53,0.07) 0%, transparent 60%)">
+          </div>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-orange/10 flex items-center justify-center text-2xl">🏆</div>
+            <div>
+              <h3 class="font-syne font-bold text-white text-lg">Smart India Hackathon 2025</h3>
+              <div class="font-mono text-orange text-xs mt-0.5">National Level · 6-Member Team</div>
+            </div>
+          </div>
+          <p class="text-muted text-sm leading-relaxed mb-4">Travel & Tourism AI innovation — progressed through
+            Internal and External Review rounds. Built Django backend + frontend interfaces. Gained deep experience in
+            app marketing and project management under pressure.</p>
+          <div class="font-mono text-xs text-muted">Team: Dhanyasakthi, Tharukesh, Gowtham, Harish, Prasanna Adithyaa
+          </div>
+        </div>
+
+        <!-- DEVSPARK'25 -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-7 relative overflow-hidden hover:border-purple/50 transition-all group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"
+            style="background:radial-gradient(circle at var(--mx) var(--my), rgba(123,97,255,0.07) 0%, transparent 60%)">
+          </div>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-purple/10 flex items-center justify-center text-2xl">⚡</div>
+            <div>
+              <h3 class="font-syne font-bold text-white text-lg">DEVSPARK'25</h3>
+              <div class="font-mono text-purple text-xs mt-0.5">IEEE CS SYP · 24-Hour National Hackathon</div>
+            </div>
+          </div>
+          <p class="text-muted text-sm leading-relaxed mb-4">KPR Institute of Engineering and Technology, Coimbatore.
+            Built a verified professional services marketplace from scratch in 24 hours with team Sabari, Santhosh &
+            Surya.</p>
+          <div class="font-mono text-xs text-muted">Team: Sabari R K, Santhosh A, R Surya</div>
+        </div>
+
+        <!-- Air India Radio -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-7 relative overflow-hidden hover:border-accent/50 transition-all group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"></div>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-2xl">🎙️</div>
+            <div>
+              <h3 class="font-syne font-bold text-white text-lg">Air India Radio — Guest Speaker</h3>
+              <div class="font-mono text-accent text-xs mt-0.5">Sunday 5 PM Show · CIT Representative</div>
+            </div>
+          </div>
+          <p class="text-muted text-sm leading-relaxed">Represented CIT College on Air India's Sunday 5PM radio show.
+            Spoke on <span class="text-white italic">"Watching Cinema in Theatres vs OTT Platforms"</span> — stepping
+            outside my comfort zone into live broadcast media.</p>
+        </div>
+
+        <!-- IEEE Paper -->
+        <div
+          class="reveal tilt-card bg-card border border-border rounded-2xl p-7 relative overflow-hidden hover:border-accent/50 transition-all group"
+          style="--mx:50%;--my:50%">
+          <div class="card-shine"></div>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-2xl">📄</div>
+            <div>
+              <h3 class="font-syne font-bold text-white text-lg">IEEE Paper Presentation</h3>
+              <div class="font-mono text-accent text-xs mt-0.5">Coimbatore Institute of Technology · 2025</div>
+            </div>
+          </div>
+          <p class="text-muted text-sm leading-relaxed">Presented research paper at IEEE event hosted at CIT —
+            contributing to academic discourse on emerging technology topics.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       SKILLS
+  ═══════════════════════════════════════════════════ -->
+  <section id="skills" class="py-32 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="reveal">
+        <div class="font-mono text-accent text-xs tracking-widest uppercase mb-4">// 04. Skills</div>
+        <h2 class="font-syne font-black text-4xl md:text-5xl tracking-tight mb-16">
+          Technical <span class="grad-text">Arsenal</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-16">
+        <!-- Left: Skill bars -->
+        <div class="reveal space-y-8">
+          <div>
+            <div class="font-syne font-bold text-sm text-white mb-6 uppercase tracking-widest">Languages</div>
+            <div class="space-y-5" id="skill-bars">
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">Python</span><span
+                    class="text-muted">90%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="90"></div>
+                </div>
+              </div>
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">Java</span><span
+                    class="text-muted">80%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="80"></div>
+                </div>
+              </div>
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">C / C++</span><span
+                    class="text-muted">85%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="85"></div>
+                </div>
+              </div>
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">HTML / CSS</span><span
+                    class="text-muted">92%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="92"></div>
+                </div>
+              </div>
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">SQL</span><span
+                    class="text-muted">75%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="75"></div>
+                </div>
+              </div>
+              <div class="skill-item">
+                <div class="flex justify-between font-mono text-xs mb-2"><span class="text-white">JavaScript</span><span
+                    class="text-muted">82%</span></div>
+                <div class="h-0.5 bg-border rounded">
+                  <div class="skill-bar-fill" data-width="82"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Tech tags -->
+        <div class="reveal">
+          <div class="font-syne font-bold text-sm text-white mb-6 uppercase tracking-widest">Frameworks & Tools</div>
+          <div class="flex flex-wrap gap-3 mb-10">
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">FastAPI</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">LangChain</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Ollama</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Pydantic v2</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Django</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Vite</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Supabase</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Leaflet.js</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Git</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">GitHub</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">VS Code</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Node.js</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Express</span>
+            <span class="border border-border hover:border-accent/60 hover:text-accent text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Nodemailer</span>
+          </div>
+
+          <div class="font-syne font-bold text-sm text-white mb-6 uppercase tracking-widest">Domains</div>
+          <div class="flex flex-wrap gap-3 mb-10">
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Web Development</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Agentic AI</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Multi-Agent Systems</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">OSINT</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Database Dev</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Full-Stack</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">LLM Orchestration</span>
+            <span class="border border-purple/30 hover:border-purple/60 hover:text-purple text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Community Platforms</span>
+          </div>
+
+          <div class="font-syne font-bold text-sm text-white mb-6 uppercase tracking-widest">Soft Skills</div>
+          <div class="flex flex-wrap gap-3">
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Teamwork</span>
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Leadership</span>
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Time Management</span>
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Communication</span>
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Critical Thinking</span>
+            <span class="border border-orange/30 hover:border-orange/60 hover:text-orange text-muted font-mono text-xs px-3 py-1.5 rounded-lg transition-all cursor-default skill-tag">Problem Solving</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HackerRank badge -->
+      <div
+        class="reveal mt-16 p-6 bg-card border border-border rounded-2xl flex items-center gap-5 max-w-md hover:border-accent/50 transition-colors">
+        <div class="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center text-2xl">⭐</div>
+        <div>
+          <div class="font-syne font-bold text-white">4 Stars in C++ — HackerRank</div>
+          <div class="font-mono text-muted text-xs mt-1">Competitive programming achievement</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       CONTACT
+  ═══════════════════════════════════════════════════ -->
+  <section id="contact" class="py-32 relative">
+    <div class="orb w-96 h-96 bg-purple/8 top-0 left-1/2 -translate-x-1/2"></div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="reveal text-center mb-16">
+        <div class="font-mono text-accent text-xs tracking-widest uppercase mb-4">// 05. Contact</div>
+        <h2 class="font-syne font-black text-4xl md:text-5xl tracking-tight mb-4">
+          Let's <span class="grad-text">Connect</span>
+        </h2>
+        <p class="text-muted font-mono text-sm max-w-lg mx-auto">
+          Open to internships, collaborations, and interesting conversations about tech.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-start max-w-5xl mx-auto">
+
+        <!-- Contact info -->
+        <div class="reveal space-y-5">
+          <a href="mailto:sikavin137@gmail.com"
+            class="flex items-center gap-4 p-5 bg-card border border-border rounded-xl hover:border-accent/50 transition-all group">
+            <div
+              class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+              ✉</div>
+            <div>
+              <div class="font-mono text-xs text-muted uppercase tracking-wider mb-1">Email</div>
+              <div class="text-white text-sm font-medium">sikavin137@gmail.com</div>
+            </div>
+          </a>
+          <a href="tel:+919629575206"
+            class="flex items-center gap-4 p-5 bg-card border border-border rounded-xl hover:border-accent/50 transition-all group">
+            <div
+              class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+              📞</div>
+            <div>
+              <div class="font-mono text-xs text-muted uppercase tracking-wider mb-1">Phone</div>
+              <div class="text-white text-sm font-medium">+91 962 957 5206</div>
+            </div>
+          </a>
+          <a href="https://www.linkedin.com/in/kavin-kaarthik-492141293" target="_blank"
+            class="flex items-center gap-4 p-5 bg-card border border-border rounded-xl hover:border-purple/50 transition-all group">
+            <div
+              class="w-10 h-10 rounded-lg bg-purple/10 flex items-center justify-center text-purple group-hover:scale-110 transition-transform">
+              in</div>
+            <div>
+              <div class="font-mono text-xs text-muted uppercase tracking-wider mb-1">LinkedIn</div>
+              <div class="text-white text-sm font-medium">kavin-kaarthik-492141293</div>
+            </div>
+          </a>
+          <a href="https://github.com/Kavin-Kaarthik" target="_blank"
+            class="flex items-center gap-4 p-5 bg-card border border-border rounded-xl hover:border-accent/50 transition-all group">
+            <div
+              class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12" />
+              </svg>
+            </div>
+            <div>
+              <div class="font-mono text-xs text-muted uppercase tracking-wider mb-1">GitHub</div>
+              <div class="text-white text-sm font-medium">Kavin-Kaarthik</div>
+            </div>
+          </a>
+          <div class="flex items-center gap-4 p-5 bg-card border border-border rounded-xl">
+            <div class="w-10 h-10 rounded-lg bg-subtle flex items-center justify-center text-muted">📍</div>
+            <div>
+              <div class="font-mono text-xs text-muted uppercase tracking-wider mb-1">Location</div>
+              <div class="text-white text-sm font-medium">Coimbatore, Tamil Nadu, India</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="reveal">
+          <div class="bg-card border border-border rounded-2xl p-8 relative overflow-hidden">
+            <div
+              class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent">
+            </div>
+            <h3 class="font-syne font-bold text-xl text-white mb-6">Send a Message</h3>
+
+            <form id="contact-form" class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Name *</label>
+                  <input type="text" name="name" id="name" required placeholder="Your name" class="form-input" />
+                </div>
+                <div>
+                  <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Email *</label>
+                  <input type="email" name="email" id="email" required placeholder="your@email.com"
+                    class="form-input" />
+                </div>
+              </div>
+              <div>
+                <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Subject</label>
+                <input type="text" name="subject" id="subject" placeholder="What's this about?" class="form-input" />
+              </div>
+              <div>
+                <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Message *</label>
+                <textarea name="message" id="message" required rows="5" placeholder="Your message..."
+                  class="form-input resize-none"></textarea>
+              </div>
+
+              <button type="submit" id="submit-btn"
+                class="w-full py-3 bg-accent text-bg font-syne font-bold text-sm rounded-lg hover:bg-white transition-colors duration-200 flex items-center justify-center gap-2">
+                <span id="btn-text">Send Message</span>
+                <span id="btn-loader" class="hidden">
+                  <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </span>
+              </button>
+
+              <div id="form-status" class="hidden font-mono text-xs text-center py-2 rounded-lg"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════ -->
+  <footer class="border-t border-border py-10">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="font-syne font-black text-lg"><span class="grad-text">KK</span><span class="text-muted">.</span></div>
+      <div class="font-mono text-xs text-muted text-center">
+        © 2025 Kavin Kaarthik · B.Tech IT @ CIT · Coimbatore
+      </div>
+      <div class="flex gap-5">
+        <a href="https://github.com/Kavin-Kaarthik" target="_blank"
+          class="text-muted hover:text-accent transition-colors font-mono text-xs">GitHub</a>
+        <a href="https://www.linkedin.com/in/kavin-kaarthik-492141293" target="_blank"
+          class="text-muted hover:text-accent transition-colors font-mono text-xs">LinkedIn</a>
+        <a href="mailto:sikavin137@gmail.com"
+          class="text-muted hover:text-accent transition-colors font-mono text-xs">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════════════════ -->
+  <script>
+    // ── Render skill tags (template literal fix) ───────────────────────────────
+    document.querySelectorAll('.flex.flex-wrap.gap-3').forEach(el => {
+      if (el.innerHTML.includes('{[')) {
+        const cleaned = el.innerHTML.trim();
+      }
+    });
+
+    // Re-render tag sections properly
+    const tagSections = document.querySelectorAll('[data-tags]');
+
+    (function renderTags() {
+      const fw = ['FastAPI', 'LangChain', 'Ollama', 'Pydantic v2', 'Django', 'Vite', 'Supabase', 'Leaflet.js', 'Git', 'GitHub', 'VS Code', 'Node.js', 'Express', 'Nodemailer'];
+      const domains = ['Web Development', 'Agentic AI', 'Multi-Agent Systems', 'OSINT', 'Database Dev', 'Full-Stack', 'LLM Orchestration', 'Community Platforms'];
+      const soft = ['Teamwork', 'Leadership', 'Time Management', 'Communication', 'Critical Thinking', 'Problem Solving'];
+
+      const wrappers = document.querySelectorAll('.skill-tag')
+      // Already rendered from HTML – no extra work needed
+    })();
+  </script>
+
+  <script>
+    // ─────────────────────────────────────────────────────
+    //  CURSOR TRACKING
+    // ─────────────────────────────────────────────────────
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top = my + 'px';
+    });
+
+    // Ring follows with smooth lag
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+
+    // ─────────────────────────────────────────────────────
+    //  ORB PARALLAX (follow cursor)
+    // ─────────────────────────────────────────────────────
+    const orb1 = document.getElementById('orb1');
+    const orb2 = document.getElementById('orb2');
+    document.addEventListener('mousemove', e => {
+      const xFrac = e.clientX / window.innerWidth - 0.5;
+      const yFrac = e.clientY / window.innerHeight - 0.5;
+      if (orb1) orb1.style.transform = `translate(${xFrac * 40}px, ${yFrac * 40}px)`;
+      if (orb2) orb2.style.transform = `translate(${-xFrac * 30}px, ${-yFrac * 30}px)`;
+    });
+
+    // ─────────────────────────────────────────────────────
+    //  CARD TILT (3D cursor tracking)
+    // ─────────────────────────────────────────────────────
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const rotX = ((y - cy) / cy) * -8;
+        const rotY = ((x - cx) / cx) * 8;
+        card.style.transform = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02,1.02,1.02)`;
+        card.style.setProperty('--mx', (x / rect.width * 100) + '%');
+        card.style.setProperty('--my', (y / rect.height * 100) + '%');
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(600px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+      });
+    });
+
+    // ─────────────────────────────────────────────────────
+    //  PARTICLE CANVAS
+    // ─────────────────────────────────────────────────────
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+
+    const PARTICLE_COUNT = 60;
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
+    }));
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,229,255,${p.alpha})`;
+        ctx.fill();
+      });
+
+      // Draw connections
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0,229,255,${0.06 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    // ─────────────────────────────────────────────────────
+    //  TYPEWRITER
+    // ─────────────────────────────────────────────────────
+    const roles = [
+      'B.Tech IT Student @ CIT',
+      'Full-Stack Developer',
+      'Agentic AI Engineer',
+      'Hackathon Builder',
+      'CGPA: 8.7 · Coimbatore',
+    ];
+    let ri = 0, ci = 0, deleting = false;
+    const tw = document.getElementById('typewriter-text');
+
+    function typeWrite() {
+      const current = roles[ri];
+      if (!deleting) {
+        tw.textContent = current.substring(0, ci + 1);
+        ci++;
+        if (ci === current.length) { deleting = true; setTimeout(typeWrite, 1800); return; }
+      } else {
+        tw.textContent = current.substring(0, ci - 1);
+        ci--;
+        if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+      }
+      setTimeout(typeWrite, deleting ? 40 : 80);
+    }
+    setTimeout(typeWrite, 600);
+
+    // ─────────────────────────────────────────────────────
+    //  NAVBAR scroll style
+    // ─────────────────────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        navbar.style.background = 'rgba(8,12,16,0.95)';
+        navbar.style.borderBottomColor = '#1a2535';
+      } else {
+        navbar.style.background = 'transparent';
+        navbar.style.borderBottomColor = 'transparent';
+      }
+    });
+
+    // Active nav link
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    });
+
+    // Mobile menu
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // ─────────────────────────────────────────────────────
+    //  GSAP SCROLL ANIMATIONS
+    // ─────────────────────────────────────────────────────
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero entrance
+    gsap.to('#hero-tag', { opacity: 1, y: 0, duration: .7, delay: .1, ease: 'power3.out' });
+    gsap.to('#hero-name', { opacity: 1, y: 0, duration: .7, delay: .25, ease: 'power3.out' });
+    gsap.to('#hero-role', { opacity: 1, y: 0, duration: .7, delay: .4, ease: 'power3.out' });
+    gsap.to('#hero-desc', { opacity: 1, y: 0, duration: .7, delay: .5, ease: 'power3.out' });
+    gsap.to('#hero-cta', { opacity: 1, y: 0, duration: .7, delay: .65, ease: 'power3.out' });
+    gsap.to('#hero-stats', { opacity: 1, y: 0, duration: .7, delay: .8, ease: 'power3.out' });
+    gsap.from('#hero-visual', { opacity: 0, x: 60, duration: 1, delay: .4, ease: 'power3.out' });
+
+    // Section reveals
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+          delay: (i % 3) * 0.12
+        }
+      );
+    });
+
+    // Skill bars (trigger when in view)
+    ScrollTrigger.create({
+      trigger: '#skill-bars',
+      start: 'top 80%',
+      onEnter: () => {
+        document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width + '%';
+        });
+      }
+    });
+
+    // Skill tags stagger
+    gsap.utils.toArray('.skill-tag').forEach((tag, i) => {
+      gsap.from(tag, {
+        opacity: 0, scale: 0.8,
+        duration: .4, delay: i * 0.04,
+        ease: 'back.out(2)',
+        scrollTrigger: { trigger: tag, start: 'top 90%', toggleActions: 'play none none none' }
+      });
+    });
+
+    // ─────────────────────────────────────────────────────
+    //  CONTACT FORM SUBMISSION
+    // ─────────────────────────────────────────────────────
+    document.getElementById('contact-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const loader = document.getElementById('btn-loader');
+      const status = document.getElementById('form-status');
+
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim(),
+      };
+
+      btn.disabled = true;
+      btnText.textContent = 'Sending…';
+      loader.classList.remove('hidden');
+      status.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          status.textContent = '✓ Message sent! I\'ll get back to you soon.';
+          status.className = 'font-mono text-xs text-center py-2 rounded-lg bg-accent/10 text-accent border border-accent/20';
+          this.reset();
+        } else {
+          throw new Error(json.message || 'Failed');
+        }
+      } catch (err) {
+        status.textContent = '✗ ' + (err.message || 'Something went wrong. Try emailing directly.');
+        status.className = 'font-mono text-xs text-center py-2 rounded-lg bg-red-900/20 text-red-400 border border-red-800/30';
+      } finally {
+        status.classList.remove('hidden');
+        btn.disabled = false;
+        btnText.textContent = 'Send Message';
+        loader.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+
+</html>
